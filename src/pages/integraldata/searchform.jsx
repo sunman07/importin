@@ -22,7 +22,7 @@ import {
 } from 'antd';
 const { RangePicker } = DatePicker;
 const SearchSubUnit = props => {
-  const { onSearch, onReset, scopeOfSystem } = props;
+  const { onSearch, onReset } = props;
   const [moduleEntry, setModuleEntry] = useState([]); // 模块select
   const [objectEntry, setObjectEntry] = useState([]); // 项目select
   const [standardEntry, setStandardEntry] = useState([]); // 项目select
@@ -41,8 +41,6 @@ const SearchSubUnit = props => {
 
   //获取字典项
   const getSelectSum = () => {
-    // setTimeout(()=>{console.log(paramSystem,'props!!!');},4000)
-
     //模块字典
     getModuleDic().then(res => {
       if (res.status === 200) {
@@ -64,7 +62,6 @@ const SearchSubUnit = props => {
     getGradeWithTerm({ code_type: 'AcademicYear' }).then(res => {
       if (res.status === 200) {
         setTermEntry(res.data.list);
-        console.log(res.data.list, '返回列表');
       } else {
         message.error('获取学年字典失败');
       }
@@ -140,16 +137,13 @@ const SearchSubUnit = props => {
         {' '}
         <Row gutter={24}>
           <Col span={6}>
-            <Form.Item name="AcademicYearCode" label="范围：">
-              <Select placeholder="请选择" className={styles.selecton}>
-                {scopeOfSystem &&
-                  scopeOfSystem.length > 0 &&
-                  scopeOfSystem.map(i => (
-                    <Option value={i.code} key={i.code}>
-                      {i.code_name}
-                    </Option>
-                  ))}
-              </Select>
+            <Form.Item name="StuName" label="姓名：">
+              <Input className={styles.inputSearch} placeholder="请输入" />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item name="StuUserCode" label="学号：">
+              <Input className={styles.inputSearch} placeholder="请输入" />
             </Form.Item>
           </Col>
           <Col span={6}>
@@ -178,6 +172,8 @@ const SearchSubUnit = props => {
               </Select>
             </Form.Item>
           </Col>
+        </Row>
+        <Row className={styles.rowGrids} gutter={24}>
           <Col span={6}>
             <Form.Item name="ClassCode" label="班级：">
               <Select placeholder="请选择" className={styles.selecton}>
@@ -191,8 +187,6 @@ const SearchSubUnit = props => {
               </Select>
             </Form.Item>
           </Col>
-        </Row>
-        <Row className={styles.rowGrids} gutter={24}>
           <Col span={6}>
             <Form.Item name="ModuleCode" label="模块：">
               <Select
@@ -240,21 +234,16 @@ const SearchSubUnit = props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6}>
-            <Form.Item name="StuUserCode" label="学号：">
-              <Input className={styles.inputSearch} placeholder="请输入" />
-            </Form.Item>
-          </Col>
         </Row>
         <Row className={styles.rowGrids} gutter={24}>
           <Col span={6}>
-            <Form.Item name="StuName" label="姓名：">
-              <Input className={styles.inputSearch} placeholder="请输入" />
+            <Form.Item name="DateTime" label="参与日期：" {...rangeConfig}>
+              <RangePicker showTime format="YYYY-MM-DD" />
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item name="DateTime" label="获得日期：" {...rangeConfig}>
-              <RangePicker showTime format="YYYY-MM-DD" />
+            <Form.Item name="StuName" label="详情：">
+              <Input className={styles.inputSearch} placeholder="请输入" />
             </Form.Item>
           </Col>
           <Col span={6} align="right"></Col>

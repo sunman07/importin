@@ -136,7 +136,6 @@ const StandardConfigSecondary = () => {
     //清空主列表
     setConfigEntry([]);
     getScoreOfEntry(paramsOfEntry).then(res => {
-      console.log(res.data, '列表');
       if (res.status == 200) {
         setMainloading(false);
         setMainTotal(res.data.Total);

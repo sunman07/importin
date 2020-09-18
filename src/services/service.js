@@ -1,8 +1,81 @@
 import axios from '@/lib/fetch';
+import http from '../lib/fetch';
 import { stringify } from 'qs';
 const baseUrl = '/apartment';
 const baseLink = '/secondclassroom';
+//提交excel综合
+export const submitAllSum = params => {
+  return axios
+    .post(baseLink + `/api/v1/scoreimport/importscore`, params)
+    .then(res => {
+      return res;
+    });
+};
+//获取学年学期/api/v1/stuoperate/queryacademicyearterm
+export const getTermAndYear = () => {
+  return axios
+    .get(baseLink + `/api/v1/stuoperate/queryacademicyearterm`)
+    .then(res => {
+      return res;
+    });
+};
+//请求七牛所需的token
+export const importTokenGet = (name, size) => {
+  return http.postJSON({
+    Router: '/api/fproof/appget',
+    Method: 'POST',
+    Body: {
+      Name: name,
+      Size: size,
+      BizType: 'act',
+    },
+  });
+};
 
+//处理七牛所需的token
+export const dealWithToken = (file, key) => {
+  return http.postJSON({
+    Router: '/api/system/saveattach',
+    Method: 'POST',
+    Body: {
+      BizType: '',
+      AttachmentItemName: file.name || '',
+      AttachmentItemType: file.type,
+      AttachmentItemSize: file.size.toString(),
+      AttachmentURL: key,
+    },
+  });
+};
+
+//导入Excel
+export const importConfigEntry = params => {
+  return axios
+    .post(baseLink + `/api/v1/scoreimport/importscore`, params)
+    .then(res => {
+      return res;
+    });
+};
+//批量删除
+export const delConfigEntry = params => {
+  return axios
+    .post(baseLink + `/api/v1/scoreimport/delimportscore`, params)
+    .then(res => {
+      return res;
+    });
+};
+//下载模板
+export const downloadExcelData = params => {
+  return axios
+    .getblob({
+      url: baseLink + `/api/v1/scoreimport/importtemplate`,
+      method: 'get',
+      data: {},
+      responseType: 'blob',
+    })
+    .then(res => {
+      return res;
+    });
+};
 //导出学分
 export const exportAcquireData = params => {
   return axios
@@ -63,7 +136,7 @@ export const getScoreOfEntry = params => {
   return axios
     .get(
       baseLink +
-        `/api/v1/scoredataview/integraldata?Page=${params.Page}&PageCount=${params.PageCount}&AcademicYearCode=${params.AcademicYearCode}&AcademicTermCode=${params.AcademicTermCode}&AcademyCode=${params.AcademyCode}&GradeCode=${params.GradeCode}&ClassCode=${params.ClassCode}&ModuleCode=${params.ModuleCode}&ItemCode=${params.ItemCode}&StandardCode=${params.StandardCode}&StuUserCode=${params.StuUserCode}&StuName=${params.StuName}&StartDate=${params.StartDate}&EndDate=${params.EndDate}`,
+        `/api/v1/scoreimport/queryimportscore?Page=${params.Page}&PageCount=${params.PageCount}&AcademicYearCode=${params.AcademicYearCode}&AcademicTermCode=${params.AcademicTermCode}&AcademyCode=${params.AcademyCode}&GradeCode=${params.GradeCode}&ClassCode=${params.ClassCode}&ModuleCode=${params.ModuleCode}&ItemCode=${params.ItemCode}&StandardCode=${params.StandardCode}&StuUserCode=${params.StuUserCode}&StuName=${params.StuName}&StartDate=${params.StartDate}&EndDate=${params.EndDate}`,
     )
     .then(res => {
       return res;

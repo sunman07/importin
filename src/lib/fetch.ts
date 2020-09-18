@@ -2,12 +2,6 @@ import axios from './request';
 import { message } from 'antd';
 
 const baseUrl = '/h5api/v1/school';
-const instance = axios.create({
-  baseURL: '',
-  timeout: 1000,
-  headers: { 'X-Custom-Header': 'foobar' },
-  responseType: 'blob',
-});
 
 let req = {
   //配置文件流get方法
@@ -39,10 +33,7 @@ let req = {
     return axios.delete(url);
   },
 
-  postJSON(
-    { Router = '', Method = '', Body = {} },
-    url = '/api/staff/interface',
-  ) {
+  postJSON({ Router, Method, Body }, url = '/api/staff/interface') {
     return axios
       .post(
         url,
@@ -54,8 +45,12 @@ let req = {
       )
       .then(r => {
         const data = r.data;
+        if (r.status == 429) {
+          message.info('服务器繁忙,请过会重试!');
+          return r;
+        }
         if (data.FeedbackCode === 1) {
-          message.info('接口访问异常!');
+          message.info(`${Router}接口访问失败!`);
         } else {
           return r;
         }
@@ -64,6 +59,7 @@ let req = {
         message.info('接口访问异常!');
       });
   },
+
   /**
    *
    * @param formData

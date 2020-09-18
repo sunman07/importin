@@ -4,14 +4,12 @@ import React, {
   forwardRef,
   useImperativeHandle,
   Fragment,
+  useRef,
 } from 'react';
-import { Table, Divider, Row, Col, Button, message } from 'antd';
+import { Table, Divider, Row, Col, Button, message, Modal } from 'antd';
+import FormEntering from './forminput';
 import styles from './integraldata.less';
-import {
-  getApproveScore,
-  exportIntegralData,
-  getScoreOfEntry,
-} from '@/services/service';
+import { delConfigEntry } from '@/services/service';
 const MainContent = forwardRef((props, ref) => {
   const {
     mainData,
@@ -23,12 +21,22 @@ const MainContent = forwardRef((props, ref) => {
     searchValues,
   } = props;
   const [pageNum, setPageNum] = useState(1);
+  const [selectedRowKey, setSelectedRowKey] = useState(String);
+  const [stepOfInput, setStepOfInput] = useState(false);
+
   useImperativeHandle(ref, () => ({
     subPageChange: subPageChange,
   }));
   const subPageChange = value => {
     setPageNum(value);
     pageChange(value);
+  };
+
+  //选择行
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRowKey(selectedRowKeys);
+    },
   };
 
   const columns = [
@@ -77,36 +85,21 @@ const MainContent = forwardRef((props, ref) => {
 
     {
       title: '获得积分',
-      dataIndex: 'Score',
-      key: 'Score',
+      dataIndex: 'CurScore',
+      key: 'CurScore',
     },
     {
-      title: '原始分数',
-      dataIndex: 'OriScore',
-      key: 'OriScore',
+      title: '时长',
+      dataIndex: 'TimeLen',
+      key: 'TimeLen',
     },
     {
-      title: '获得日期',
-      dataIndex: 'StartDate',
-      key: 'StartDate',
+      title: '参与时间',
+      dataIndex: 'ParticipateDate',
+      key: 'ParticipateDate',
     },
     {
-      title: '来源',
-      dataIndex: 'Source',
-      key: 'Source',
-    },
-    {
-      title: '审批日期',
-      dataIndex: 'ApprovalDate',
-      key: 'ApprovalDate',
-    },
-    {
-      title: '审批人',
-      dataIndex: 'Operator',
-      key: 'Operator',
-    },
-    {
-      title: '详细描述',
+      title: '详细',
       dataIndex: 'address',
       render: (text, record) => {
         return (
@@ -129,36 +122,43 @@ const MainContent = forwardRef((props, ref) => {
     },
   ];
 
-  //导出
-  const exportLet = () => {
-    console.log(searchValues, '参数');
-    let paramsIntegral = searchValues;
-
-    //单独请求文件下载
-    exportIntegralData(paramsIntegral).then(res => {
-      if (res.status === 200) {
-        let blobs = res.data;
-        let reader = new FileReader();
-        reader.readAsDataURL(blobs);
-        reader.onload = e => {
-          // 转换完成，创建一个a标签用于下载
-          let a = document.createElement('a');
-          a.download = '积分数据.xlsx';
-          a.href = e.target.result;
-          a.click();
-          message.success('下载成功');
-        };
-      } else {
-        message.error('获取文件流失败');
+  //
+  const delEntryItem = () => {
+    const params = {
+      RecordId: selectedRowKey,
+    };
+    delConfigEntry(params).then(res => {
+      if (res.status === 200 && res.data.Msg === '操作成功') {
+        message.success(res.data.Msg);
+        onReset();
       }
     });
+  };
+
+  const importEntryItem = () => {
+    setStepOfInput(true);
+  };
+
+  const formRef = useRef(null);
+
+  const submitItem = values => {
+    console.log(formRef.current);
+    formRef.current.submitItem();
+    // formRef.current.submitItem();
+    // setStepOfInput(false)
+  };
+  const cancelItem = () => {
+    setStepOfInput(false);
   };
   return (
     <Fragment>
       <Row className={styles.mainApprove}>
         <Col span="24" align="right">
-          <Button onClick={exportLet} type="primary">
-            导出
+          <Button onClick={delEntryItem} className={styles.itemDel}>
+            批量删除
+          </Button>
+          <Button onClick={importEntryItem} type="primary">
+            批量导入
           </Button>
         </Col>
       </Row>
@@ -166,6 +166,7 @@ const MainContent = forwardRef((props, ref) => {
         columns={columns}
         dataSource={mainData}
         rowKey="RecordId"
+        rowSelection={rowSelection}
         loading={mainloading}
         pagination={{
           total: pageTotal,
@@ -177,6 +178,17 @@ const MainContent = forwardRef((props, ref) => {
         bordered={true}
         hideOnSinglePage={false}
       />
+      <Modal
+        title="批量导入"
+        visible={stepOfInput}
+        onOk={submitItem}
+        onCancel={() => {
+          cancelItem();
+        }}
+        destroyOnClose
+      >
+        <FormEntering ref={formRef} onSubmit={submitItem} />
+      </Modal>
     </Fragment>
   );
 });

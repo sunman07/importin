@@ -4,6 +4,25 @@
     background: #f0f2f5 !important;
   }
 }
+.formInput {
+  .moduleDown {
+    float: left;
+    margin-left: 10px;
+  }
+  .moduleUp {
+    float: left;
+  }
+  .colorInfo {
+    color: #ff4d4f;
+  }
+  .dateMark {
+    :global {
+      .ant-picker {
+        width: 225px;
+      }
+    }
+  }
+}
 
 .frontpage {
   :global {
@@ -19,6 +38,10 @@
       padding: 15px 36px 15px 36px;
       background: #ffffff;
     }
+  }
+
+  .itemDel {
+    float: left;
   }
 
   .searchform {
@@ -43,7 +66,8 @@
     .rowGrids {
       margin-top: 15px;
     }
-    .inputSearch,.rangePeri {
+    .inputSearch,
+    .rangePeri {
       width: calc(100% - 3px);
     }
   }
